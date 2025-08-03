@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Talikhata (তালিখাতা)</title>
+
+    <!-- Inter font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui"],
+            },
+            colors: {
+              brandBlue: "#2563EB",
+              brandGreen: "#16A34A",
+              brandYellow: "#CA8A04",
+              brandRed: "#DC2626",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-feature-settings: "liga" 1;
+      }
+      * {
+        transition-property: background-color, border-color, color, fill, stroke,
+          opacity, box-shadow, transform;
+        transition-duration: 300ms;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+      }
+      input:focus,
+      select:focus,
+      button:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5);
+        border-color: #2563eb;
+      }
+      .remove-btn {
+        background-color: #dc2626;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.375rem;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+      }
+      .remove-btn:hover {
+        background-color: #b91c1c;
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(220, 38, 38, 0.5);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6 font-sans min-h-screen flex flex-col"
+  >
+    <header class="flex justify-between items-center mb-10">
+      <h1 class="text-4xl font-semibold text-brandBlue dark:text-brandBlue">
+        📘 টালিখাতা
+      </h1>
+      <button
+        onclick="toggleDarkMode()"
+        aria-label="Toggle dark mode"
+        class="bg-brandBlue text-white px-5 py-2 rounded-md shadow-md hover:bg-blue-700 focus:ring-4 focus:ring-brandBlue/50"
+      >
+        🌙 Dark Mode
+      </button>
+    </header>
+
+    <!-- Entry Form -->
+    <section
+      class="mb-10 max-w-5xl mx-auto w-full bg-gray-50 dark:bg-gray-800 p-6 rounded-md shadow-md"
+    >
+      <h2 class="text-xl font-semibold mb-6 text-gray-700 dark:text-gray-200">
+        Add New Entry
+      </h2>
+      <form id="entryForm" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <input
+          type="date"
+          id="date"
+          required
+          class="p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600"
+        />
+        <input
+          type="text"
+          id="category"
+          placeholder="Category"
+          required
+          class="p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600"
+        />
+        <input
+          type="number"
+          id="amount"
+          placeholder="Amount"
+          min="0"
+          step="0.01"
+          required
+          class="p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600"
+        />
+        <select
+          id="type"
+          required
+          class="p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600"
+        >
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+        <input
+          type="text"
+          id="note"
+          placeholder="Note (optional)"
+          class="p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 md:col-span-3"
+        />
+        <button
+          type="submit"
+          class="bg-brandGreen text-white font-semibold px-6 py-3 rounded-md shadow-md hover:bg-green-700 focus:ring-4 focus:ring-brandGreen/50 md:col-span-1"
+        >
+          ➕ Add Entry
+        </button>
+      </form>
+    </section>
+
+    <!-- Filters & Export -->
+    <section
+      class="mb-10 max-w-5xl mx-auto w-full bg-gray-50 dark:bg-gray-800 p-6 rounded-md shadow-md"
+    >
+      <h2 class="text-xl font-semibold mb-6 text-gray-700 dark:text-gray-200">
+        Filter Entries & Export
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
+        <input
+          id="filterCategory"
+          type="text"
+          placeholder="Filter by category"
+          class="p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600"
+        />
+        <input
+          id="startDate"
+          type="date"
+          class="p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600"
+        />
+        <input
+          id="endDate"
+          type="date"
+          class="p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600"
+        />
+        <button
+          onclick="exportCSV()"
+          class="bg-brandYellow text-white font-semibold px-6 py-3 rounded-md shadow-md hover:bg-yellow-700 focus:ring-4 focus:ring-brandYellow/50"
+        >
+          📁 Export CSV
+        </button>
+      </div>
+    </section>
+
+    <!-- Summaries -->
+    <section
+      class="mb-8 max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-8"
+    >
+      <div
+        id="monthlySummary"
+        class="p-6 bg-blue-50 dark:bg-blue-900 rounded-md shadow-md text-lg font-semibold text-brandBlue text-center"
+      ></div>
+      <div
+        id="yearlySummary"
+        class="p-6 bg-green-50 dark:bg-green-900 rounded-md shadow-md text-lg font-semibold text-brandGreen text-center"
+      ></div>
+    </section>
+
+    <!-- Entry List -->
+    <main class="max-w-5xl mx-auto w-full flex flex-col space-y-6 flex-grow">
+      <div id="entryList" class="space-y-6"></div>
+      <button
+        id="removeAllBtn"
+        class="self-end bg-brandRed px-6 py-3 rounded-md font-semibold shadow-md hover:bg-red-700 focus:ring-4 focus:ring-red-600/50 transition"
+      >
+        🗑️ Remove All Entries
+      </button>
+    </main>
+
+    <script>
+      document.documentElement.classList.add("dark");
+
+      function toggleDarkMode() {
+        document.documentElement.classList.toggle("dark");
+      }
+
+      const entryForm = document.getElementById("entryForm");
+      const entryList = document.getElementById("entryList");
+      const monthlySummary = document.getElementById("monthlySummary");
+      const yearlySummary = document.getElementById("yearlySummary");
+      const filterCategory = document.getElementById("filterCategory");
+      const startDate = document.getElementById("startDate");
+      const endDate = document.getElementById("endDate");
+      const removeAllBtn = document.getElementById("removeAllBtn");
+
+      let entries = JSON.parse(
+        localStorage.getItem("talikhataEntries") || "[]"
+      );
+
+      function saveEntries() {
+        localStorage.setItem("talikhataEntries", JSON.stringify(entries));
+      }
+
+      function renderEntries(list) {
+        entryList.innerHTML = "";
+        if (list.length === 0) {
+          entryList.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400">No entries found.</p>`;
+          return;
+        }
+        list.forEach((e, index) => {
+          const div = document.createElement("div");
+          div.className =
+            "p-5 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 shadow hover:shadow-lg transition flex justify-between items-center";
+          div.innerHTML = `
+          <div>
+            <div class="text-gray-700 dark:text-gray-300 font-semibold text-lg">${
+              e.category
+            }</div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">${e.date} ${
+            e.note ? "· " + e.note : ""
+          }</div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="font-semibold text-xl ${
+              e.type === "income" ? "text-brandGreen" : "text-brandRed"
+            }">
+              ${e.type === "income" ? "+" : "-"}৳${e.amount.toFixed(2)}
+            </div>
+            <button class="remove-btn" aria-label="Remove entry">🗑️ Remove</button>
+          </div>
+        `;
+
+          // Remove entry event
+          div.querySelector(".remove-btn").addEventListener("click", () => {
+            if (confirm("Are you sure you want to remove this entry?")) {
+              entries.splice(index, 1);
+              saveEntries();
+              filterAndRender();
+            }
+          });
+
+          entryList.appendChild(div);
+        });
+      }
+
+      function updateSummaries(filtered) {
+        const now = new Date();
+        const thisMonth = now.getMonth();
+        const thisYear = now.getFullYear();
+        let monthTotal = 0,
+          yearTotal = 0;
+
+        filtered.forEach((e) => {
+          const date = new Date(e.date);
+          const amount = e.type === "income" ? e.amount : -e.amount;
+          if (date.getFullYear() === thisYear) yearTotal += amount;
+          if (date.getMonth() === thisMonth && date.getFullYear() === thisYear)
+            monthTotal += amount;
+        });
+
+        monthlySummary.textContent = `📅 Monthly Summary: ৳${monthTotal.toFixed(
+          2
+        )}`;
+        yearlySummary.textContent = `📆 Yearly Summary: ৳${yearTotal.toFixed(
+          2
+        )}`;
+      }
+
+      function filterAndRender() {
+        const cat = filterCategory.value.toLowerCase();
+        const start = new Date(startDate.value);
+        const end = new Date(endDate.value);
+
+        const filtered = entries.filter((e) => {
+          const date = new Date(e.date);
+          const matchesCat = cat
+            ? e.category.toLowerCase().includes(cat)
+            : true;
+          const matchesStart = isNaN(start.getTime()) || date >= start;
+          const matchesEnd = isNaN(end.getTime()) || date <= end;
+          return matchesCat && matchesStart && matchesEnd;
+        });
+
+        updateSummaries(filtered);
+        renderEntries(filtered);
+      }
+
+      entryForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const entry = {
+          date: document.getElementById("date").value,
+          category: document.getElementById("category").value.trim(),
+          amount: parseFloat(document.getElementById("amount").value),
+          type: document.getElementById("type").value,
+          note: document.getElementById("note").value.trim(),
+        };
+        entries.push(entry);
+        saveEntries();
+        filterAndRender();
+        entryForm.reset();
+      });
+
+      filterCategory.addEventListener("input", filterAndRender);
+      startDate.addEventListener("change", filterAndRender);
+      endDate.addEventListener("change", filterAndRender);
+
+      removeAllBtn.addEventListener("click", () => {
+        if (entries.length === 0) {
+          alert("No entries to remove.");
+          return;
+        }
+        if (
+          confirm(
+            "Are you sure you want to remove ALL entries? This action cannot be undone."
+          )
+        ) {
+          entries = [];
+          saveEntries();
+          filterAndRender();
+        }
+      });
+
+      function exportCSV() {
+        let csv = "Date,Category,Amount,Type,Note\n";
+        entries.forEach((e) => {
+          csv += `${e.date},${e.category},${e.amount.toFixed(2)},${e.type},${
+            e.note || ""
+          }\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "talikhata.csv";
+        a.click();
+      }
+
+      // Initial render
+      filterAndRender();
+    </script>
+  </body>
+</html>
